@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de CEP</title>
+    <!-- Inclusão da biblioteca jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            background-color: #20232a;
+            color: #61dafb;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        #form-cep {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        input[type="text"] {
+            width: 250px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border: 2px solid #61dafb;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #61dafb;
+            color: #20232a;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #21a1f1;
+        }
+
+        #resultado-consulta {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        #resultado-consulta p {
+            font-size: 1.1em;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Consulta de CEP</h1>
+
+        <!-- Formulário para entrada do CEP -->
+        <div id="form-cep">
+            <label for="input-cep">CEP:</label>
+            <input type="text" id="input-cep" placeholder="Ex: 80030-130">
+            <button id="btn-consultar">Consultar</button>
+        </div>
+
+        <!-- Div para exibir o resultado da consulta (inicialmente oculta) -->
+        <div id="resultado-consulta">
+            <h2>Resultado da Consulta:</h2>
+            <p>CEP: <span id="cep-encontrado"></span></p>
+            <p>Logradouro: <span id="logradouro-encontrado"></span></p>
+            <p>Bairro: <span id="bairro-encontrado"></span></p>
+            <p>Cidade: <span id="cidade-encontrado"></span></p>
+            <p>Estado: <span id="estado-encontrado"></span></p>
+        </div>
+    </div>
+
+    <!-- Script JavaScript para realizar a consulta via AJAX -->
+    <script>
+        $(document).ready(function() {
+            // Ao clicar no botão de consulta
+            $("#btn-consultar").click(function() {
+                var cep = $("#input-cep").val();
+
+                // Validação simples do CEP
+                if (cep.length < 8) {
+                    alert("CEP inválido!");
+                    return;
+                }
+
+                // Requisição AJAX para a API do ViaCEP
+                $.ajax({
+                    url: "https://viacep.com.br/ws/" + cep + "/json/",
+                    method: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        // Verifica se ocorreu algum erro na resposta
+                        if (data.erro) {
+                            alert("CEP não encontrado!");
+                            return;
+                        }
+
+                        // Exibe a div de resultado e preenche as informações
+                        $("#resultado-consulta").show();
+                        $("#cep-encontrado").text(data.cep);
+                        $("#logradouro-encontrado").text(data.logradouro);
+                        $("#bairro-encontrado").text(data.bairro);
+                        $("#cidade-encontrado").text(data.localidade);
+                        $("#estado-encontrado").text(data.uf);
+                    },
+                    error: function() {
+                        alert("Erro ao consultar CEP!");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
